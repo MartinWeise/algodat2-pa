@@ -8,6 +8,10 @@ import java.util.HashSet;
  */
 public class KMST extends AbstractKMST {
 
+	private Integer numNodes;
+	private Integer numEdges;
+	private HashSet<Edge> edges;
+	private int k;
 	/**
 	 * Der Konstruktor. Hier ist die richtige Stelle f&uuml;r die
 	 * Initialisierung Ihrer Datenstrukturen.
@@ -22,7 +26,10 @@ public class KMST extends AbstractKMST {
 	 *            Die Anzahl der Knoten, die Ihr MST haben soll
 	 */
 	public KMST(Integer numNodes, Integer numEdges, HashSet<Edge> edges, int k) {
-		// TODO: Hier ist der richtige Platz fuer Initialisierungen
+		this.numEdges = numEdges;
+		this.numNodes = numNodes;
+		this.edges = edges;
+		this.k = k;
 	}
 
 	/**
