@@ -1,6 +1,7 @@
 package ad2.ss16.pa;
 
-import java.util.HashSet;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Klasse zum Berechnen eines k-MST mittels Branch-and-Bound. Hier sollen Sie
@@ -12,6 +13,10 @@ public class KMST extends AbstractKMST {
 	private Integer numEdges;
 	private HashSet<Edge> edges;
 	private int k;
+
+	private HashSet<Integer> nodes;
+	private ArrayList<PriorityQueue<Integer>> G;
+
 	/**
 	 * Der Konstruktor. Hier ist die richtige Stelle f&uuml;r die
 	 * Initialisierung Ihrer Datenstrukturen.
@@ -30,6 +35,25 @@ public class KMST extends AbstractKMST {
 		this.numNodes = numNodes;
 		this.edges = edges;
 		this.k = k;
+
+		// Knotenliste
+		this.nodes = new HashSet<>(this.numNodes);
+		for (int i = 0; i < this.numNodes; i++) {
+			this.nodes.add(i);
+		}
+
+		// Adjaszenzliste
+		G = new ArrayList<>();
+		for (Integer n : this.nodes) {
+			this.G.add(n, new PriorityQueue<>());
+		}
+		for (Edge e : this.edges) {
+			this.G.get(e.node1).add(e.node2);
+			this.G.get(e.node2).add(e.node1);
+		}
+
+
+
 	}
 
 	/**
@@ -43,7 +67,43 @@ public class KMST extends AbstractKMST {
 	 */
 	@Override
 	public void run() {
-		// TODO: Diese Methode ist von Ihnen zu implementieren
+//		int s = 0;
+//		for (Integer node : this.getComponentNodes(s)) {
+//			this.prim(node);
+//		}
 	}
+
+	/**
+	 * Liefert bei &uuml;bergebenen Knoten alle erreichbaren Knoten im Graphen zur&uuml;ck.
+	 * @param node: Knoten
+	 * @return Liste der erreichbaren Knoten
+     */
+	private ArrayList<Integer> getComponentNodes(int node) {
+		boolean[] visited = new boolean[this.numNodes];
+
+		// erreichbare Knoten markieren
+		getComponentNodesR(node, visited);
+
+		// in Liste packen
+		ArrayList<Integer> ret = new ArrayList<>();
+		for (int i = 0; i < this.nodes.size(); i++) {
+			if (visited[i]) {
+				ret.add(i);
+			}
+		}
+		return ret;
+	}
+
+	private void getComponentNodesR(int node, boolean[] visited) {
+		visited[node] = true;
+		for (Integer u : this.G.get(node)) {
+			if (!visited[u]) {
+				getComponentNodesR(u, visited);
+			}
+		}
+	}
+
+
+
 
 }
