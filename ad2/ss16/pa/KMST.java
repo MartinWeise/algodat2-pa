@@ -8,10 +8,9 @@ import java.util.*;
  */
 public class KMST extends AbstractKMST {
 
-	private Integer numNodes;
-	private Integer numEdges;
-	private HashSet<Edge> edges;
-	private int k;
+	private Edge[] edges;
+	private Edge[] solution;
+	private boolean[] taken;
 
 	/**
 	 * Der Konstruktor. Hier ist die richtige Stelle f&uuml;r die
@@ -27,12 +26,9 @@ public class KMST extends AbstractKMST {
 	 *            Die Anzahl der Knoten, die Ihr MST haben soll
 	 */
 	public KMST(Integer numNodes, Integer numEdges, HashSet<Edge> edges, int k) {
-		this.numEdges = numEdges;
-		this.numNodes = numNodes;
-		this.edges = edges;
-		this.k = k;
-
-
+		this.edges = edges.toArray(new Edge[0]);
+		this.solution = new Edge[k-1];
+		this.taken = new boolean[numNodes];
 	}
 
 	/**
@@ -46,6 +42,99 @@ public class KMST extends AbstractKMST {
 	 */
 	@Override
 	public void run() {
+
+	}
+
+	private class MinHeap {
+
+		ArrayList<Integer> storage = new ArrayList<>();
+
+		public void push(Integer v) {
+			int pos = this.storage.size();
+			this.storage.add(pos, v);
+			this.heapifyUp(pos);
+		}
+		
+		public Integer pull() {
+			Integer ret = this.storage.remove(0);
+			this.heapifyDown(0);
+			return ret;
+		}
+
+		public int getPosition(int v) {
+			return this.storage.indexOf(v);
+		}
+
+		public Integer getValue(int k) {
+			return this.storage.get(k);
+		}
+
+		public Integer getLeftChild(int k) {
+			return this.storage.get(2*k + 1);
+		}
+
+		public Integer getRightChild(int k) {
+			return this.storage.get(2*k + 2);
+		}
+
+		public Integer getParent(int k) {
+			return this.storage.get((int) Math.floor((k-1)/2));
+		}
+
+		private void heapifyUp(int i) {
+			if (i > 1) {
+				int j = (int) Math.floor(i / 2);
+				if (this.storage.get(i) < this.storage.get(j)) {
+					// swap
+					Integer temp = this.storage.get(i);
+					this.storage.set(i, this.storage.get(j));
+					this.storage.set(j, temp);
+					this.heapifyUp(j);
+				}
+			}
+		}
+
+		private void heapifyDown(int i) {
+			int n = this.storage.size() - 1;
+			int j;
+			if (2*i > n) { // Leaf
+				return;
+			} else if (2*i < n) {
+				int l = 2*i;
+				int r = 2*i + 1;
+				j = this.storage.indexOf(Math.min(this.storage.get(l),this.storage.get(r)));
+			} else {
+				j = 2*i;
+			}
+			if (this.storage.get(j) < this.storage.get(i)) {
+				Integer temp = this.storage.get(i);
+				this.storage.set(i, this.storage.get(j));
+				this.storage.set(j, temp);
+				this.heapifyDown(j);
+			}
+		}
+
+		private boolean check(int root)	{
+			int l = 2 * root + 1, r = 2 * root + 2;
+
+			if (r < this.storage.size()) {
+				if (this.storage.get(l) < this.storage.get(root) || this.storage.get(r) < this.storage.get(root)) {
+					return false;
+				}
+				return check(l) && check(r);
+			} else if (l < this.storage.size()) {
+				if (this.storage.get(l) < this.storage.get(root)) {
+					return false;
+				}
+				return check(l);
+			} else {
+				return true;
+			}
+		}
+
+		public String toString() {
+			return this.storage.toString();
+		}
 
 	}
 
