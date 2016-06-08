@@ -47,93 +47,78 @@ public class KMST extends AbstractKMST {
 
 	private class MinHeap {
 
-		ArrayList<Integer> storage = new ArrayList<>();
+		private HashMap<Integer, Edge> H = new HashMap<>();
+		private Integer size;
 
-		public void push(Integer v) {
-			int pos = this.storage.size();
-			this.storage.add(pos, v);
-			this.heapifyUp(pos);
+		public MinHeap() {
+			this.size = 0;
+			this.H.put(0, new Edge(0,0,Integer.MIN_VALUE));
 		}
-		
-		public Integer pull() {
-			Integer ret = this.storage.remove(0);
-			this.heapifyDown(0);
+
+		public void push(Edge v) {
+			int n = size + 1;
+			this.H.put(n,v);
+			this.size++;
+			this.heapifyUp(n);
+		}
+
+		public Edge pull() {
+			Edge ret = this.H.remove(1);
+			this.size--;
+			this.heapifyDown(1);
 			return ret;
-		}
-
-		public int getPosition(int v) {
-			return this.storage.indexOf(v);
-		}
-
-		public Integer getValue(int k) {
-			return this.storage.get(k);
-		}
-
-		public Integer getLeftChild(int k) {
-			return this.storage.get(2*k + 1);
-		}
-
-		public Integer getRightChild(int k) {
-			return this.storage.get(2*k + 2);
-		}
-
-		public Integer getParent(int k) {
-			return this.storage.get((int) Math.floor((k-1)/2));
 		}
 
 		private void heapifyUp(int i) {
 			if (i > 1) {
 				int j = (int) Math.floor(i / 2);
-				if (this.storage.get(i) < this.storage.get(j)) {
+				if (this.H.get(i).weight < this.H.get(j).weight) {
 					// swap
-					Integer temp = this.storage.get(i);
-					this.storage.set(i, this.storage.get(j));
-					this.storage.set(j, temp);
+					Edge temp = this.H.get(i);
+					this.H.replace(i, this.H.get(j));
+					this.H.replace(j, temp);
 					this.heapifyUp(j);
 				}
 			}
 		}
 
 		private void heapifyDown(int i) {
-			int n = this.storage.size() - 1;
+			int n = this.size - 1;
 			int j;
 			if (2*i > n) { // Leaf
 				return;
 			} else if (2*i < n) {
 				int l = 2*i;
 				int r = 2*i + 1;
-				j = this.storage.indexOf(Math.min(this.storage.get(l),this.storage.get(r)));
+				Edge min = this.H.get(l).weight > this.H.get(r).weight ? this.H.get(r) : this.H.get(l);
+				j = this.getKey(min);
 			} else {
 				j = 2*i;
 			}
-			if (this.storage.get(j) < this.storage.get(i)) {
-				Integer temp = this.storage.get(i);
-				this.storage.set(i, this.storage.get(j));
-				this.storage.set(j, temp);
+			if (this.H.get(j).weight < this.H.get(i).weight) {
+				Edge temp = this.H.get(i);
+				this.H.replace(i, this.H.get(j));
+				this.H.replace(j, temp);
 				this.heapifyDown(j);
 			}
 		}
 
-		private boolean check(int root)	{
-			int l = 2 * root + 1, r = 2 * root + 2;
-
-			if (r < this.storage.size()) {
-				if (this.storage.get(l) < this.storage.get(root) || this.storage.get(r) < this.storage.get(root)) {
-					return false;
-				}
-				return check(l) && check(r);
-			} else if (l < this.storage.size()) {
-				if (this.storage.get(l) < this.storage.get(root)) {
-					return false;
-				}
-				return check(l);
-			} else {
-				return true;
+		public String toString() {
+			String out = "[";
+			for(Edge e : this.H.values()) {
+				out += e.weight + ",";
 			}
+			out = out.substring(0,out.length()-1) + "]";
+			return out;
 		}
 
-		public String toString() {
-			return this.storage.toString();
+		private Integer getKey(Edge v) {
+			for (Integer i : this.H.keySet()) {
+				if (this.H.get(i).equals(v)) {
+					return i;
+				}
+			}
+			throw new RuntimeException("Key "+v+" not found in MinHeap");
 		}
 
 	}
