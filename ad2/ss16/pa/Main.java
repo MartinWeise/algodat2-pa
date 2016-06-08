@@ -288,8 +288,8 @@ public class Main {
 			}
 			s.add(e.node1);
 		}
-
 		if (nodes.size() != k) {
+			System.out.println(nodes.size() + " vs. " + k);
 			bailOut("Der k-MST enthaelt nicht genau k Knoten!");
 		}
 
