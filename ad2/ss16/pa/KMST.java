@@ -11,6 +11,8 @@ public class KMST extends AbstractKMST {
 	private Edge[] edges;
 	private Edge[] solution;
 	private boolean[] taken;
+	private final Integer numNodes;
+	private final Integer k;
 
 	/**
 	 * Der Konstruktor. Hier ist die richtige Stelle f&uuml;r die
@@ -29,6 +31,8 @@ public class KMST extends AbstractKMST {
 		this.edges = edges.toArray(new Edge[0]);
 		this.solution = new Edge[k-1];
 		this.taken = new boolean[numNodes];
+		this.numNodes = numNodes;
+		this.k = k;
 	}
 
 	/**
@@ -42,10 +46,10 @@ public class KMST extends AbstractKMST {
 	 */
 	@Override
 	public void run() {
-// TreeMap to store Prim's results ordered by their weight.
+		// TreeMap to store Prim's results ordered by their weight.
 		// TODO: Try a minimum heap with min() in O(1) instead of a
 		//       balanced tree (O(logn)).
-		Map<Integer, Integer> roots = new TreeMap<Integer, Integer>();
+		Map<Integer, Integer> roots = new TreeMap<>();
 
 		Edge[] edges = new Edge[this.edges.length];
 		int n, weight, relevantEdges, root, lowerBound = 0;
@@ -57,7 +61,7 @@ public class KMST extends AbstractKMST {
 		// Choosing the cheapest k - 1 edges is not very intelligent. There is no guarantee
 		// that this subset of edges even induces a subgraph over the initial graph.
 		// TODO: Find a better initial lower bound.
-		for (int i = 0; i < solution.length; i++) {
+		for (int i = 0; i < k - 1; i++) {
 			lowerBound += this.edges[i].weight;
 		}
 
@@ -65,8 +69,8 @@ public class KMST extends AbstractKMST {
 		// until k - 1 edges are fixed.
 		// As all induced subgraphs have k nodes and are connected according to Prim, they
 		// are candidate solutions and thus submitted.
-		for (root = 0; root < taken.length; root++) {
-			taken = new boolean[taken.length];
+		for (root = 0; root < this.numNodes; root++) {
+			taken = new boolean[this.numNodes];
 			System.arraycopy(this.edges, 0, edges, 0, this.edges.length);
 
 			taken[root] = true;
@@ -74,7 +78,7 @@ public class KMST extends AbstractKMST {
 			weight = 0;
 			relevantEdges = this.edges.length;
 
-			while (n < solution.length) {
+			while (n < k - 1) {
 				for (int i = 0; i < relevantEdges; i++) {
 					// XOR to check if connected and no circle.
 					if (taken[edges[i].node1] ^ taken[edges[i].node2]) {
@@ -93,21 +97,21 @@ public class KMST extends AbstractKMST {
 			}
 			// Sum up what we've just collected and submit this
 			// solution to the framework.
-			HashSet<Edge> set = new HashSet<Edge>(solution.length);
+			Set<Edge> sol = new HashSet<>();
 			for (int i = 0; i < solution.length; i++) {
-				set.add(solution[i]);
+				sol.add(solution[i]);
 			}
-			setSolution(weight, set);
+			setSolution(weight, sol);
 			roots.put(weight, root);
 		}
 
 		// Now for the real business, let's do some Branch-and-Bound. Roots of "k Prim Spanning Trees"
 		// are enumerated by weight to increase our chances to obtain the kMST earlier.
 		for (int item : roots.values()) {
-			taken = new boolean[taken.length];
+			taken = new boolean[this.numNodes];
 			System.arraycopy(this.edges, 0, edges, 0, this.edges.length);
 			taken[item] = true;
-			branchAndBound(edges, solution.length, 0, lowerBound);
+			branchAndBound(edges, k - 1, 0, lowerBound);
 		}
 	}
 
@@ -118,8 +122,8 @@ public class KMST extends AbstractKMST {
 			edge = edges[i];
 			if (left == 0) {
 				// No nodes are left to fix, we have reached a solution.
-				HashSet<Edge> set = new HashSet<Edge>(solution.length);
-				for (int j = 0; j < solution.length; j++) {
+				HashSet<Edge> set = new HashSet<Edge>(k - 1);
+				for (int j = 0; j < k - 1; j++) {
 					set.add(solution[j]);
 				}
 				setSolution(weight, set);
@@ -134,7 +138,7 @@ public class KMST extends AbstractKMST {
 				// Choosing this edge does not break requirements of a tree.
 
 				// We choose this edge.
-				solution[solution.length - left] = edge;
+				solution[k - 1 - left] = edge;
 
 				// Find out which node was selected and indicate this in taken.
 				taken[(tmp = taken[edge.node1] ? edge.node2 : edge.node1)] = true;
