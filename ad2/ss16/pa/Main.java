@@ -84,6 +84,10 @@ public class Main {
 	 *            interpretiert.
 	 */
 	public static void main(String[] args) {
+		run(args);
+	}
+
+	public static void run(String[] args) {
 
 		Scanner is = processArgs(args);
 
@@ -446,7 +450,8 @@ public class Main {
 	 * Privater Konstruktor.
 	 *
 	 */
-	private Main() {
+	public Main(String[] args) {
+		run(args);
 	}
 
 }

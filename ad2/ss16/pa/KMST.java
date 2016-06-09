@@ -188,62 +188,46 @@ public class KMST extends AbstractKMST {
 	}
 
 	private void quickSort(int left, int right) {
-		Edge tmp;
 
-		if (right - left < 5) {
-			for (int p = left + 1; p <= right; p++) {
-				tmp = edges[p];
-				int j;
+		int i = left, j = right;
+		// Get the pivot element from the middle of the list
+		int pivot = edges[left + (right-left)/2].weight;
 
-				for (j = p; j > left && tmp.compareTo(edges[j - 1]) < 0; j--)
-					edges[j] = edges[j - 1];
-
-				edges[j] = tmp;
+		// Divide into two lists
+		while (i <= j) {
+			// If the current value from the left list is smaller then the pivot
+			// element then get the next element from the left list
+			while (edges[i].weight < pivot) {
+				i++;
 			}
-			return;
+			// If the current value from the right list is larger then the pivot
+			// element then get the next element from the right list
+			while (edges[j].weight > pivot) {
+				j--;
+			}
+
+			// If we have found a values in the left list which is larger then
+			// the pivot element and if we have found a value in the right list
+			// which is smaller then the pivot element then we exchange the
+			// values.
+			// As we are done we can increase i and j
+			if (i <= j) {
+//				exchange(i, j);
+				Edge tmp = edges[i];
+				edges[i] = edges[j];
+				edges[j] = tmp;
+				i++;
+				j--;
+			}
 		}
+		// Recursion
+		if (left < j)
+			quickSort(left, j);
+		if (i < right)
+			quickSort(i, right);
 
-		int middle = (left + right) / 2;
 
-		if (edges[middle].compareTo(edges[left]) < 0) {
-			tmp = edges[middle];
-			edges[middle] = edges[left];
-			edges[left] = tmp;
-		}
-		if (edges[right].compareTo(edges[left]) < 0) {
-			tmp = edges[right];
-			edges[right] = edges[left];
-			edges[left] = tmp;
-		}
-		if (edges[right].compareTo(edges[middle]) < 0) {
-			tmp = edges[right];
-			edges[right] = edges[middle];
-			edges[middle] = tmp;
-		}
 
-		tmp = edges[middle];
-		edges[middle] = edges[right - 1];
-		edges[right - 1] = tmp;
-
-		Edge p = edges[right - 1];
-
-		int i, j;
-		for (i = left, j = right - 1;;) {
-			while (edges[++i].compareTo(p) < 0);
-			while (p.compareTo(edges[--j]) < 0);
-			if (i >= j) break;
-
-			tmp = edges[i];
-			edges[i] = edges[j];
-			edges[j] = tmp;
-		}
-
-		tmp = edges[left];
-		edges[left] = edges[i - 1];
-		edges[i - 1] = tmp;
-
-		quickSort(left, i - 1);
-		quickSort(j + 1, right);
 	}
 
 }
