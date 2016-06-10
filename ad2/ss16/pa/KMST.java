@@ -221,11 +221,12 @@ public class KMST extends AbstractKMST {
 			}
 		}
 		// Recursion
-		if (left < j)
+		if (left < j) {
 			quickSort(left, j);
-		if (i < right)
+		}
+		if (i < right) {
 			quickSort(i, right);
-
+		}
 
 
 	}
