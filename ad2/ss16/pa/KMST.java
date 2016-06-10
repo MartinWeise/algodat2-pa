@@ -64,6 +64,7 @@ public class KMST extends AbstractKMST {
 		for (int i = 0; i < k - 1; i++) {
 			lowerBound += this.edges[i].weight;
 		}
+		lowerBound *= 1.2;
 
 		// Iterate over all nodes in the graph and run Prim's algorithm
 		// until k - 1 edges are fixed.
@@ -128,13 +129,11 @@ public class KMST extends AbstractKMST {
 				}
 				setSolution(weight, set);
 				return;
-			}
-			else if (weight + edge.weight > getSolution().getUpperBound()) {
+			} else if (weight + edge.weight > getSolution().getUpperBound()) {
 				// The selection of edges so far plus the weight of the next edge
 				// exceeds the upper bound, so kill this branch.
 				return;
-			}
-			else if (taken[edge.node1] ^ taken[edge.node2]) {
+			} else if (taken[edge.node1] ^ taken[edge.node2]) {
 				// Choosing this edge does not break requirements of a tree.
 
 				// We choose this edge.
@@ -157,8 +156,7 @@ public class KMST extends AbstractKMST {
 				if (i + left > relevantEdges) {
 					// Not enough edges left.
 					return;
-				}
-				else if ((lowerBound += (i < left - 1 ? edges[left - 1].weight : edges[i + 1].weight) - edge.weight) >= getSolution().getUpperBound()) {
+				} else if ((lowerBound += (i < left - 1 ? edges[left - 1].weight : edges[i + 1].weight) - edge.weight) >= getSolution().getUpperBound()) {
 					// This branch will never reach a better solution than we've already found, because
 					// the lower bound minus the weight of the edge we selected plus the weight of the
 					// next best edge exceeds the upper bound.
@@ -166,7 +164,7 @@ public class KMST extends AbstractKMST {
 				}
 			}
 			else if (taken[edge.node1]) {
-				System.arraycopy(edges, i + 1, edges, i, relevantEdges-- - i-- - 1);
+//				System.arraycopy(edges, i + 1, edges, i, relevantEdges-- - i-- - 1);
 
 				if (i + left > relevantEdges) {
 					return;
