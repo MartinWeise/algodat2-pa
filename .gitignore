@@ -1,3 +1,5 @@
 .idea/*
 ad2.zip
 public_instances.zip
+out/*
+*.iml
